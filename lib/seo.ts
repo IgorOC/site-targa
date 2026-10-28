@@ -53,7 +53,8 @@ export function dealerJsonLd(content: Content) {
     description: "Loja de carros seminovos premium em Uberlândia-MG: SUVs, picapes, sedans e esportivos revisados, com procedência, preço e quilometragem publicados.",
     url: SITE.url,
     logo: absolute("/brand/logo.png"),
-    image: absolute("/opengraph-image"),
+    // Foto real da fachada ajuda o Google a reconhecer a loja; a imagem de compartilhamento fica de apoio
+    image: [absolute("/loja/fachada-targa.jpg"), absolute("/opengraph-image")],
     telephone: `+${contact.phone1Tel}`,
     email: contact.email || undefined,
     priceRange: "R$ 40 mil – R$ 800 mil",
