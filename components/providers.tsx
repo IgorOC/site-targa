@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useSyncExternalStore } from "react"
 import { usePathname } from "next/navigation"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
@@ -28,6 +28,52 @@ type SiteState = {
   setConsent: (value: Exclude<Consent, "unknown">) => void
 }
 
+// Preferências guardadas no navegador (comparação, favoritos, consentimento). São lidas como uma fonte
+// externa: o servidor renderiza com os valores padrão e o navegador assume os salvos ao hidratar.
+const COMPARE_KEY = "targa-compare"
+const FAVS_KEY = "targa-favs"
+const CONSENT_KEY = "targa-consent"
+const storageListeners = new Set<() => void>()
+
+function subscribeStorage(listener: () => void) {
+  storageListeners.add(listener)
+  window.addEventListener("storage", listener)
+  return () => {
+    storageListeners.delete(listener)
+    window.removeEventListener("storage", listener)
+  }
+}
+
+function readStorage(key: string) {
+  try {
+    return localStorage.getItem(key)
+  } catch {
+    return null
+  }
+}
+
+function writeStorage(key: string, value: string) {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // Navegação privada ou armazenamento bloqueado: segue sem guardar
+  }
+  storageListeners.forEach((listener) => listener())
+}
+
+function parseList<T>(raw: string | null): T[] {
+  try {
+    const value = JSON.parse(raw || "[]")
+    return Array.isArray(value) ? value : []
+  } catch {
+    return []
+  }
+}
+
+function useStored(key: string) {
+  return useSyncExternalStore(subscribeStorage, () => readStorage(key), () => null)
+}
+
 const ContentContext = createContext<Content | null>(null)
 const SiteContext = createContext<SiteState | null>(null)
 
@@ -45,25 +91,16 @@ export function useSite() {
 
 export function Providers({ content, children }: { content: Content; children: React.ReactNode }) {
   const pathname = usePathname()
-  const [compare, setCompare] = useState<CompareItem[]>([])
-  const [favs, setFavs] = useState<string[]>([])
+  const compareRaw = useStored(COMPARE_KEY)
+  const favsRaw = useStored(FAVS_KEY)
+  const consentRaw = useStored(CONSENT_KEY)
+  const compare = useMemo(() => parseList<CompareItem>(compareRaw), [compareRaw])
+  const favs = useMemo(() => parseList<string>(favsRaw), [favsRaw])
+  const consent: Consent = consentRaw === "essential" || consentRaw === "all" ? consentRaw : "unknown"
+  // Falso no servidor e na hidratação; verdadeiro assim que o navegador assume os dados salvos
+  const ready = useSyncExternalStore(subscribeStorage, () => true, () => false)
   const [toast, setToast] = useState("")
   const [interest, setInterestState] = useState<Interest>(null)
-  const [consent, setConsentState] = useState<Consent>("unknown")
-  const [ready, setReady] = useState(false)
-
-  useEffect(() => {
-    try {
-      setCompare(JSON.parse(localStorage.getItem("targa-compare") || "[]"))
-      setFavs(JSON.parse(localStorage.getItem("targa-favs") || "[]"))
-      const saved = localStorage.getItem("targa-consent")
-      if (saved === "essential" || saved === "all") setConsentState(saved)
-    } catch {
-      setCompare([])
-      setFavs([])
-    }
-    setReady(true)
-  }, [])
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger)
@@ -94,38 +131,28 @@ export function Providers({ content, children }: { content: Content; children: R
   const setInterest = useCallback((value: Interest) => setInterestState(value), [])
 
   const toggleCompare = useCallback((item: CompareItem) => {
-    setCompare((current) => {
-      const exists = current.some((entry) => entry.slug === item.slug)
-      const next = exists ? current.filter((entry) => entry.slug !== item.slug) : current.length >= 3 ? current : [...current, item]
-      if (!exists && current.length >= 3) {
-        setToast("Você pode comparar até 3 carros.")
-        window.setTimeout(() => setToast(""), 2400)
-        return current
-      }
-      localStorage.setItem("targa-compare", JSON.stringify(next))
-      if (!exists) track({ type: "compare", vehicleSlug: item.slug })
-      return next
-    })
+    const current = parseList<CompareItem>(readStorage(COMPARE_KEY))
+    const exists = current.some((entry) => entry.slug === item.slug)
+    if (!exists && current.length >= 3) {
+      setToast("Você pode comparar até 3 carros.")
+      window.setTimeout(() => setToast(""), 2400)
+      return
+    }
+    const next = exists ? current.filter((entry) => entry.slug !== item.slug) : [...current, item]
+    writeStorage(COMPARE_KEY, JSON.stringify(next))
+    if (!exists) track({ type: "compare", vehicleSlug: item.slug })
   }, [])
 
   const toggleFav = useCallback((slug: string) => {
-    setFavs((current) => {
-      const next = current.includes(slug) ? current.filter((item) => item !== slug) : [...current, slug]
-      localStorage.setItem("targa-favs", JSON.stringify(next))
-      if (!current.includes(slug)) track({ type: "favorite", vehicleSlug: slug })
-      return next
-    })
+    const current = parseList<string>(readStorage(FAVS_KEY))
+    const exists = current.includes(slug)
+    writeStorage(FAVS_KEY, JSON.stringify(exists ? current.filter((item) => item !== slug) : [...current, slug]))
+    if (!exists) track({ type: "favorite", vehicleSlug: slug })
   }, [])
 
-  const clearCompare = useCallback(() => {
-    setCompare([])
-    localStorage.setItem("targa-compare", "[]")
-  }, [])
+  const clearCompare = useCallback(() => writeStorage(COMPARE_KEY, "[]"), [])
 
-  const setConsent = useCallback((value: Exclude<Consent, "unknown">) => {
-    localStorage.setItem("targa-consent", value)
-    setConsentState(value)
-  }, [])
+  const setConsent = useCallback((value: Exclude<Consent, "unknown">) => writeStorage(CONSENT_KEY, value), [])
 
   const state = useMemo<SiteState>(
     () => ({ compare, favs, toast, interest, consent, ready, toggleCompare, toggleFav, clearCompare, setInterest, setConsent }),
