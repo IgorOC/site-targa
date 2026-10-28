@@ -14,9 +14,15 @@ async function load(): Promise<Db> {
   } catch (error) {
     const code = (error as NodeJS.ErrnoException).code
     if (code !== "ENOENT") throw error
-    await fs.mkdir(path.dirname(file), { recursive: true })
     const db = structuredClone(seed)
-    await fs.writeFile(file, JSON.stringify(db, null, 2), "utf8")
+    // Em hospedagem sem disco gravável (Vercel), segue com os dados iniciais em memória.
+    // O painel só passa a salvar alterações quando os dados forem para o banco (Supabase).
+    try {
+      await fs.mkdir(path.dirname(file), { recursive: true })
+      await fs.writeFile(file, JSON.stringify(db, null, 2), "utf8")
+    } catch {
+      // disco somente leitura
+    }
     return db
   }
 }

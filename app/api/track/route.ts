@@ -43,7 +43,8 @@ export async function POST(request: Request) {
   const origin = classifySource(String(body.referrer || ""), String(body.landing || ""), new URL(request.url).hostname)
   const meta = body.meta && typeof body.meta === "object" ? { ...body.meta } : {}
   meta.channel = origin.channel
-  await updateDb((db) => {
+  // Métrica nunca derruba a navegação: se não der para gravar, só ignora o evento
+  const saved = await updateDb((db) => {
     db.events.push({
       id: `evt_${randomUUID()}`,
       type,
@@ -58,6 +59,9 @@ export async function POST(request: Request) {
       staff,
       meta,
     })
-  })
-  return NextResponse.json({ ok: true })
+  }).then(
+    () => true,
+    () => false,
+  )
+  return NextResponse.json({ ok: saved })
 }

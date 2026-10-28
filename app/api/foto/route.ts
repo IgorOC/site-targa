@@ -43,7 +43,10 @@ export async function GET(request: Request) {
     .webp({ quality: 80 })
     .toBuffer()
 
-  await fs.mkdir(cacheDir, { recursive: true })
-  await fs.writeFile(file, output).catch(() => undefined)
+  // Cache em disco quando dá; sem disco gravável (Vercel), o cache fica só na CDN pelo Cache-Control
+  await fs
+    .mkdir(cacheDir, { recursive: true })
+    .then(() => fs.writeFile(file, output))
+    .catch(() => undefined)
   return new Response(new Uint8Array(output), { headers })
 }
