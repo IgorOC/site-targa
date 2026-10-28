@@ -124,10 +124,77 @@ input[type="range"] {
   animation-delay: 0.15s;
 }
 
-/* Foto de fundo do hero: bordas fundidas no preto da página */
-.hero-plate {
-  -webkit-mask-image: linear-gradient(to right, transparent, #000 16%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 34%, #000 88%, transparent);
-  -webkit-mask-composite: source-in;
-  mask-image: linear-gradient(to right, transparent, #000 16%, #000 94%, transparent), linear-gradient(to bottom, transparent, #000 34%, #000 88%, transparent);
-  mask-composite: intersect;
+/* Hero: a foto em pé (3:4) fica centrada no carro, abaixo do meio da tela, deixando o alto livre para o texto */
+.hero-pin {
+  --car-y: 72svh;
+}
+
+.hero-photo {
+  --w: max(min(100vw, 210svh), 480px);
+  position: absolute;
+  left: 50%;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  aspect-ratio: 3 / 4;
+  /* 0,856 = altura do centro do carro na foto (1284 px de 2000) × 4/3 */
+  top: calc(var(--car-y) - var(--w) * 0.856);
+  /* o zoom acontece em torno do carro */
+  transform-origin: 50% 64.2%;
+}
+
+/* No celular a foto não cobre o alto da tela: o topo se funde no preto. Degradê por cima em vez de
+   mask-image, que deixava a foto lavada no Chrome do Windows. */
+.hero-photo::after {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 14%;
+  background: linear-gradient(to bottom, var(--color-obsidian), transparent);
+  pointer-events: none;
+}
+
+/* Em telas baixas, só título e botões, para o texto não encostar no carro */
+@media (max-height: 760px) {
+  .hero-sub {
+    display: none;
+  }
+}
+
+/* A logo entra suave ao abrir o site */
+@keyframes hero-logo {
+  from { opacity: 0; filter: blur(10px); transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; filter: none; transform: none; }
+}
+
+.hero-logo {
+  animation: hero-logo 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.hero-logo-sub {
+  animation: hero-logo 1.2s 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo,
+  .hero-logo-sub {
+    animation: none;
+  }
+}
+
+/* Na home, o cabeçalho e o WhatsApp só entram depois que o hero termina de montar */
+.site-header,
+.site-float {
+  transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.5s ease;
+}
+
+html:not([data-hero="done"]):has(.hero-pin) .site-header {
+  transform: translateY(-130%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+html:not([data-hero="done"]):has(.hero-pin) .site-float {
+  transform: translateY(160%);
+  opacity: 0;
+  pointer-events: none;
 }

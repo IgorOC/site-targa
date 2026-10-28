@@ -42,7 +42,7 @@ export function WhatsAppButton() {
       href={waLink(contact.whatsappTel, message)}
       target="_blank"
       rel="noreferrer"
-      className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-[22px] bg-white px-4 py-3 text-sm font-medium text-obsidian shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
+      className="site-float fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-[22px] bg-white px-4 py-3 text-sm font-medium text-obsidian shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
       onClick={() => {
         track({ type: "whatsapp", vehicleSlug: interest?.slug, explicit: true })
         if (interest) {
