@@ -5,8 +5,8 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { scrollBus } from "@/lib/scroll-bus"
 
-const HOLD = 2000
-const FADE = 550
+const HOLD = 2800
+const FADE = 800
 
 function lockPage() {
   document.documentElement.dataset.intro = "on"
@@ -62,7 +62,8 @@ export function PageIntro() {
 
   return (
     <div
-      className={`fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-obsidian px-6 text-center transition-opacity duration-500 ease-out ${phase === "leave" ? "pointer-events-none opacity-0" : "opacity-100"}`}
+      className={`fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-obsidian px-6 text-center transition-opacity ease-out ${phase === "leave" ? "pointer-events-none opacity-0" : "opacity-100"}`}
+      style={{ transitionDuration: `${FADE}ms` }}
       role="status"
       aria-live="polite"
       aria-label="Abrindo a Targa Motors"

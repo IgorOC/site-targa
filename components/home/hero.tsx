@@ -8,8 +8,8 @@ import { useContent } from "@/components/providers"
 import { waLink } from "@/lib/format"
 import { track } from "@/lib/track"
 
-// Hero: ao entrar, só a logo da Targa no preto. A foto do 911 se abre sozinha a partir do centro,
-// sem pedir rolagem. No fim entram o texto e o cabeçalho. Foto: confirmar o direito de uso antes de publicar.
+// Hero: ao entrar, só a logo da Targa no preto. Quando a abertura da página (PageIntro) sai, a foto do 911
+// se abre sozinha a partir do centro, sem pedir rolagem. No fim entram o texto (um item de cada vez) e o cabeçalho. Foto: confirmar o direito de uso antes de publicar.
 
 const HERO_PHOTO = "/hero/targa-cafe.jpg"
 const clamp = (value: number) => Math.min(1, Math.max(0, value))
@@ -29,10 +29,11 @@ export function Hero({ total }: { total: number }) {
     const root = document.documentElement
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const progress = { value: reduce ? 1 : 0 }
-    let start = 0
-    const hold = 1100
-    const duration = 2600
+    let start = -1
+    const hold = 500
+    const duration = 3800
     let frame = 0
+    let began = false
 
     const draw = () => {
       const view = pin.current
@@ -59,9 +60,16 @@ export function Hero({ total }: { total: number }) {
       const shown = clamp((amount - 0.62) / 0.2)
       if (shade.current) shade.current.style.opacity = String(shown)
       if (copy.current) {
-        copy.current.style.opacity = String(shown)
-        copy.current.style.transform = `translateY(${(1 - shown) * 24}px)`
+        copy.current.style.opacity = "1"
         copy.current.style.pointerEvents = shown > 0.5 ? "auto" : "none"
+        // chamada, título, texto e botões entram em sequência
+        const items = copy.current.firstElementChild?.children ?? []
+        Array.from(items).forEach((item, index) => {
+          const step = ease(clamp((amount - 0.6 - index * 0.07) / 0.2))
+          const node = item as HTMLElement
+          node.style.opacity = String(step)
+          node.style.transform = `translateY(${(1 - step) * 28}px)`
+        })
       }
       if (bar.current) bar.current.style.width = `${amount * 100}%`
       if (amount > 0.7) root.dataset.hero = "done"
@@ -69,6 +77,7 @@ export function Hero({ total }: { total: number }) {
 
     const tick = (now: number) => {
       if (!reduce) {
+        if (start < 0) start = now
         const elapsed = now - start
         progress.value = elapsed <= hold ? 0 : clamp((elapsed - hold) / duration)
       }
@@ -81,12 +90,23 @@ export function Hero({ total }: { total: number }) {
       if (view && view.getBoundingClientRect().bottom < 64) root.dataset.hero = "done"
     }
 
+    // a abertura só começa quando a tela de entrada some, para ser vista inteira
+    const begin = () => {
+      if (began) return
+      began = true
+      frame = requestAnimationFrame(tick)
+    }
     root.dataset.hero = reduce ? "done" : "intro"
-    tick(start)
+    draw()
+    if (reduce) begin()
+    window.addEventListener("targa-intro-done", begin)
+    const fallback = window.setTimeout(begin, 4500)
     window.addEventListener("resize", draw)
     window.addEventListener("scroll", revealIfPassed, { passive: true })
     return () => {
       cancelAnimationFrame(frame)
+      window.clearTimeout(fallback)
+      window.removeEventListener("targa-intro-done", begin)
       window.removeEventListener("resize", draw)
       window.removeEventListener("scroll", revealIfPassed)
       delete root.dataset.hero
