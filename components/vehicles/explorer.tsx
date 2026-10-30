@@ -1,14 +1,21 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { VehicleCard } from "@/components/vehicles/vehicle-card"
 import { BODY_LABEL } from "@/lib/format"
-import { brandCounts, EMPTY_FILTERS, filterVehicles, modelCounts, sortVehicles, type FilterState } from "@/lib/catalog"
+import { brandCounts, EMPTY_FILTERS, filtersFromParams, filterVehicles, modelCounts, sortVehicles, type FilterState } from "@/lib/catalog"
 import { track } from "@/lib/track"
 import type { BodyType, PublicVehicle } from "@/lib/types"
 
-export function Explorer({ vehicles, initial }: { vehicles: PublicVehicle[]; initial: FilterState }) {
+// A página do estoque é gerada com antecedência. No build ela sai com todos os carros (fallback do Suspense);
+// no navegador, ExplorerFromUrl lê os filtros da URL (?marca=, ?tipo=...) e monta a lista já filtrada.
+export function ExplorerFromUrl({ vehicles }: { vehicles: PublicVehicle[] }) {
+  const params = useSearchParams()
+  return <Explorer vehicles={vehicles} initial={filtersFromParams(new URLSearchParams(params.toString()))} />
+}
+
+export function Explorer({ vehicles, initial = EMPTY_FILTERS }: { vehicles: PublicVehicle[]; initial?: FilterState }) {
   const router = useRouter()
   const [filters, setFilters] = useState<FilterState>(initial)
   const [openFilters, setOpenFilters] = useState(false)
@@ -118,11 +125,12 @@ export function Explorer({ vehicles, initial }: { vehicles: PublicVehicle[]; ini
             </select>
           </label>
         </div>
+        <h2 className="sr-only">Veículos</h2>
         {result.length === 0 ? (
           <p className="rounded-[24px] border border-white/10 p-8 text-steel">Nenhum veículo com esses filtros. Limpe a busca ou fale no WhatsApp que a loja procura para você.</p>
         ) : (
           <div className="grid gap-5 md:grid-cols-2" style={{ perspective: "1200px" }}>
-            {result.map((vehicle) => <VehicleCard key={vehicle.slug} vehicle={vehicle} />)}
+            {result.map((vehicle, index) => <VehicleCard key={vehicle.slug} vehicle={vehicle} priority={index < 2} />)}
           </div>
         )}
       </div>

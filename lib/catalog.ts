@@ -75,6 +75,24 @@ export const EMPTY_FILTERS: FilterState = {
   ordem: "marca",
 }
 
+// Filtros a partir da URL do estoque (?q=&marca=&tipo=...)
+export function filtersFromParams(params: URLSearchParams): FilterState {
+  const get = (key: string) => params.get(key) || ""
+  const tipo = get("tipo")
+  return {
+    ...EMPTY_FILTERS,
+    q: get("q"),
+    marca: get("marca"),
+    modelo: get("modelo"),
+    tipo: (["suv", "picape", "sedan", "esportivo", "hatch"].includes(tipo) ? tipo : "") as FilterState["tipo"],
+    ano: get("ano"),
+    precoMin: get("precoMin"),
+    precoMax: get("precoMax"),
+    kmMax: get("kmMax"),
+    ordem: get("ordem") || "marca",
+  }
+}
+
 export function filterVehicles(list: PublicVehicle[], f: FilterState) {
   const q = f.q.trim().toLowerCase()
   return list.filter((v) => {

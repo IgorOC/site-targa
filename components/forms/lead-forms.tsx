@@ -20,7 +20,7 @@ export function ContactForm() {
         if (response.ok) event.currentTarget.reset()
       }}
     >
-      <input name="company" className="hp" tabIndex={-1} autoComplete="off" />
+      <input name="company" className="hp" tabIndex={-1} autoComplete="off" aria-label="Não preencha este campo" />
       <input name="name" required placeholder="Nome" className={field} />
       <input name="phone" required placeholder="Telefone" className={field} />
       <input name="email" type="email" placeholder="E-mail" className={field} />
@@ -55,7 +55,7 @@ export function FinanceForm({ vehicleLabel, vehicleSlug, refCode }: { vehicleLab
         <div className="h-full bg-accent" style={{ width: `${((step + 1) / 3) * 100}%` }} />
       </div>
       <p className="text-xs uppercase tracking-[0.16em] text-steel">Passo {step + 1} de 3 · {titles[step]}</p>
-      <input name="company" className="hp" tabIndex={-1} autoComplete="off" />
+      <input name="company" className="hp" tabIndex={-1} autoComplete="off" aria-label="Não preencha este campo" />
       <input type="hidden" name="vehicleSlug" value={vehicleSlug} />
       <input type="hidden" name="vehicleLabel" value={vehicleLabel} />
       <input type="hidden" name="refCode" value={refCode} />
@@ -107,7 +107,7 @@ export function SellForm() {
         <div className="h-full bg-accent" style={{ width: `${((step + 1) / 3) * 100}%` }} />
       </div>
       <p className="text-xs uppercase tracking-[0.16em] text-steel">Passo {step + 1} de 3</p>
-      <input name="company" className="hp" tabIndex={-1} autoComplete="off" />
+      <input name="company" className="hp" tabIndex={-1} autoComplete="off" aria-label="Não preencha este campo" />
       <div className={step === 0 ? "space-y-3" : "hidden"}>
         <input name="name" required={step === 0} placeholder="Seu nome" className={field} />
         <input name="phone" required={step === 0} placeholder="Telefone" className={field} />

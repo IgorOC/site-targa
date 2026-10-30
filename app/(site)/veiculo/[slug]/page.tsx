@@ -8,6 +8,12 @@ import { brl, kmLabel } from "@/lib/format"
 import { breadcrumbJsonLd, carJsonLd, photoAbsolute, vehicleTitle } from "@/lib/seo"
 import { getDb } from "@/lib/store"
 
+// Páginas dos carros geradas no build; carro novo cadastrado depois é gerado no primeiro acesso
+export async function generateStaticParams() {
+  const db = await getDb()
+  return db.vehicles.filter(isPublic).map((vehicle) => ({ slug: vehicle.slug }))
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const db = await getDb()

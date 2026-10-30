@@ -4,7 +4,7 @@ import path from "path"
 import sharp from "sharp"
 import { isAllowedPhoto } from "@/lib/photo"
 
-const WIDTHS = [256, 384, 640, 828, 1080, 1200, 1600, 1920, 2048]
+const WIDTHS = [256, 384, 640, 750, 828, 1080, 1200, 1600, 1920, 2048]
 const cacheDir = path.join(process.cwd(), ".next", "cache", "targa-fotos")
 
 // As fotos atuais do estoque são verticais, com faixas brancas dos lados.
@@ -35,7 +35,7 @@ export async function servePhoto(src: string, asked: number) {
   }
   const output = await sharp(trimmed)
     .resize({ width, withoutEnlargement: true })
-    .webp({ quality: 80 })
+    .webp({ quality: 72, effort: 5 })
     .toBuffer()
 
   // Cache em disco quando dá; sem disco gravável (Vercel), o cache fica só na CDN pelo Cache-Control

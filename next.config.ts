@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    qualities: [75, 85],
+    qualities: [70, 75, 85],
+    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       // Fotos do estoque publicadas hoje pela AutoCerto (trocar pelos originais da Targa quando chegarem)
       { protocol: "https", hostname: "www.autocerto.com", pathname: "/fotos/3705/**" },

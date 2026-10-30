@@ -8,6 +8,9 @@ import { JsonLd } from "@/components/seo/json-ld"
 import { dealerJsonLd, websiteJsonLd } from "@/lib/seo"
 import { getDb } from "@/lib/store"
 
+// Páginas públicas geradas com antecedência e refeitas a cada 5 min (ou na hora, quando o painel salva)
+export const revalidate = 300
+
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const db = await getDb()
   return (

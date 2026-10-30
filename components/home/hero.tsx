@@ -118,7 +118,7 @@ export function Hero({ total }: { total: number }) {
       <div ref={pin} className="hero-pin relative h-full overflow-hidden bg-obsidian">
         <div ref={photo} className="absolute inset-0" style={{ clipPath: "inset(50% 50% 50% 50%)" }}>
           <div ref={zoom} className="hero-photo">
-            <Image src={HERO_PHOTO} alt="Porsche 911 Targa cinza estacionado em frente a um café" fill priority sizes="max(100vw, 480px)" className="object-cover" />
+            <Image src={HERO_PHOTO} alt="Porsche 911 Targa cinza estacionado em frente a um café" fill priority quality={70} sizes="max(100vw, 480px)" className="object-cover" />
           </div>
           {/* Escurece o alto e a base da foto: texto legível e transição para o preto da página */}
           <div

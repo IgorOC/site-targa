@@ -13,7 +13,7 @@ import { CarPhoto } from "./car-photo"
 import { VehicleArt } from "./vehicle-art"
 import { recordWhatsappLead } from "@/lib/actions"
 
-export function VehicleCard({ vehicle }: { vehicle: PublicVehicle }) {
+export function VehicleCard({ vehicle, priority = false }: { vehicle: PublicVehicle; priority?: boolean }) {
   const { contact } = useContent()
   const { favs, compare, toggleFav, toggleCompare } = useSite()
   const photo = coverOf(vehicle)
@@ -30,7 +30,7 @@ export function VehicleCard({ vehicle }: { vehicle: PublicVehicle }) {
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-ink">
           {photo ? (
-            <CarPhoto src={photo} alt={`${label}, foto de capa`} fill className="object-cover object-[50%_75%]" sizes="(max-width: 768px) 100vw, 33vw" />
+            <CarPhoto src={photo} alt={`${label}, foto de capa`} fill className="object-cover object-[50%_75%]" priority={priority} sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           ) : (
             <VehicleArt bodyType={vehicle.bodyType} brand={vehicle.brand} />
           )}

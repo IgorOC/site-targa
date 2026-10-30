@@ -33,7 +33,7 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
         <div className="relative aspect-[4/5] overflow-hidden rounded-[28px] border border-white/10 bg-ink sm:aspect-[4/3]" data-cursor={vehicle.spinFrames.length > 1 ? "Arraste" : undefined}>
           {active ? (
             <>
-              <CarPhoto src={active} alt="" aria-hidden fill className="scale-110 object-cover opacity-40 blur-2xl grayscale" sizes="256px" />
+              <CarPhoto src={active} alt="" aria-hidden fill className="scale-110 object-cover opacity-40 blur-2xl grayscale" priority sizes="64px" />
               <CarPhoto src={active} alt={`${vehicle.brand} ${vehicle.model}`} fill className="object-contain" priority sizes="(max-width: 1024px) 100vw, 60vw" />
             </>
           ) : (
@@ -43,7 +43,7 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
         {photos.length > 1 && (
           <div className="mt-3 flex gap-2 overflow-x-auto" onClick={() => track({ type: "gallery", vehicleSlug: vehicle.slug })}>
             {photos.map((src, index) => (
-              <button key={src} className={`relative h-24 w-[72px] shrink-0 overflow-hidden rounded-2xl border ${index === photo ? "border-accent" : "border-white/10"}`} onClick={() => setPhoto(index)}>
+              <button key={src} className={`relative h-24 w-[72px] shrink-0 overflow-hidden rounded-2xl border ${index === photo ? "border-accent" : "border-white/10"}`} onClick={() => setPhoto(index)} aria-label={`Ver foto ${index + 1} de ${photos.length}`} aria-pressed={index === photo}>
                 <CarPhoto src={src} alt="" fill className="object-cover" sizes="96px" />
               </button>
             ))}
@@ -140,7 +140,7 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
           }}
         >
           <h2 className="font-display text-xl">Agendar visita</h2>
-          <input name="company" className="hp" tabIndex={-1} autoComplete="off" />
+          <input name="company" className="hp" tabIndex={-1} autoComplete="off" aria-label="Não preencha este campo" />
           <input name="name" required placeholder="Nome" className="w-full rounded-[16px] border border-white/10 bg-obsidian px-3 py-2" />
           <input name="phone" required placeholder="Telefone" className="w-full rounded-[16px] border border-white/10 bg-obsidian px-3 py-2" />
           <input name="when" placeholder="Dia e horário" className="w-full rounded-[16px] border border-white/10 bg-obsidian px-3 py-2" />
