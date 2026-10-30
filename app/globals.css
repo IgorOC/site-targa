@@ -161,6 +161,11 @@ input[type="range"] {
   }
 }
 
+/* Tela de entrada já vista nesta sessão: some antes de pintar */
+html[data-intro-done] .page-intro {
+  display: none;
+}
+
 /* A logo entra suave ao abrir o site */
 @keyframes hero-logo {
   from { opacity: 0; filter: blur(10px); transform: translateY(10px) scale(0.97); }

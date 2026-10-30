@@ -2,14 +2,19 @@
 
 import { useEffect, useState } from "react"
 import Image from "next/image"
-import { usePathname } from "next/navigation"
+import { INTRO_KEY as KEY } from "@/lib/intro"
 import { scrollBus } from "@/lib/scroll-bus"
 
-// Primeira abertura do site mostra a logo um pouco; nas trocas de página a tela é bem curta
-const HOLD_FIRST = 1400
-const HOLD_NAV = 450
+// A tela com a logo aparece só na primeira página aberta na sessão (aba). Depois disso, recargas e trocas
+// de página vão direto ao conteúdo: o script INTRO_SEEN_SCRIPT (layout raiz) marca <html data-intro-done>
+// antes de pintar, e o CSS esconde esta tela sem piscar.
+const HOLD = 1400
 const FADE = 450
-let opened = false
+
+function finish() {
+  document.documentElement.dataset.introDone = "1"
+  window.dispatchEvent(new Event("targa-intro-done"))
+}
 
 function lockPage() {
   document.documentElement.dataset.intro = "on"
@@ -32,24 +37,26 @@ function unlockPage() {
 }
 
 export function PageIntro() {
-  const pathname = usePathname()
-  const [track, setTrack] = useState(pathname)
   const [phase, setPhase] = useState<"show" | "leave" | "gone">("show")
 
-  if (track !== pathname) {
-    setTrack(pathname)
-    setPhase("show")
-  }
-
   useEffect(() => {
+    if (document.documentElement.dataset.introDone) {
+      finish()
+      const skip = window.setTimeout(() => setPhase("gone"), 0)
+      return () => window.clearTimeout(skip)
+    }
+    try {
+      sessionStorage.setItem(KEY, "1")
+    } catch {
+      // sem sessionStorage (aba privada bloqueada): a tela volta a aparecer na próxima carga
+    }
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const hold = reduce ? 280 : opened ? HOLD_NAV : HOLD_FIRST
-    opened = true
+    const hold = reduce ? 280 : HOLD
     const fade = reduce ? 0 : FADE
     lockPage()
     const leaveAt = window.setTimeout(() => {
       setPhase("leave")
-      window.dispatchEvent(new Event("targa-intro-done"))
+      finish()
     }, hold)
     const goneAt = window.setTimeout(() => {
       setPhase("gone")
@@ -60,13 +67,13 @@ export function PageIntro() {
       window.clearTimeout(goneAt)
       unlockPage()
     }
-  }, [pathname])
+  }, [])
 
   if (phase === "gone") return null
 
   return (
     <div
-      className={`fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-obsidian px-6 text-center transition-opacity ease-out ${phase === "leave" ? "pointer-events-none opacity-0" : "opacity-100"}`}
+      className={`page-intro fixed inset-0 z-[80] flex flex-col items-center justify-center gap-6 bg-obsidian px-6 text-center transition-opacity ease-out ${phase === "leave" ? "pointer-events-none opacity-0" : "opacity-100"}`}
       style={{ transitionDuration: `${FADE}ms` }}
       role="status"
       aria-live="polite"

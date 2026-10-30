@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { Inter, Sora } from "next/font/google"
 import "./globals.css"
+import { INTRO_SEEN_SCRIPT } from "@/lib/intro"
 import { STORE } from "@/lib/seo"
 import { SITE } from "@/lib/site"
 
@@ -54,8 +55,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={`${sora.variable} ${inter.variable} h-full antialiased`}>
+    <html lang="pt-BR" className={`${sora.variable} ${inter.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="min-h-full bg-obsidian font-sans text-porcelain">
+        <script dangerouslySetInnerHTML={{ __html: INTRO_SEEN_SCRIPT }} />
         <a
           href="#conteudo"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[90] focus:rounded-[22px] focus:bg-accent focus:px-4 focus:py-2 focus:text-obsidian"

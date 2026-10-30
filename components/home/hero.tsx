@@ -99,6 +99,8 @@ export function Hero({ total }: { total: number }) {
     root.dataset.hero = reduce ? "done" : "intro"
     draw()
     if (reduce) begin()
+    // tela de entrada já vista (ou já saiu): abre na hora; senão espera ela sair
+    if (root.dataset.introDone) begin()
     window.addEventListener("targa-intro-done", begin)
     const fallback = window.setTimeout(begin, 2500)
     window.addEventListener("resize", draw)
