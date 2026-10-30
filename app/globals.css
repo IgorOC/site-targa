@@ -15,6 +15,7 @@
 html {
   scroll-behavior: auto;
   background: #0b0b0d;
+  overflow-x: clip;
 }
 
 body {
@@ -181,9 +182,8 @@ input[type="range"] {
   }
 }
 
-/* Na home, o cabeçalho e o WhatsApp só entram depois que o hero termina de montar */
-.site-header,
-.site-float {
+/* Na home, o cabeçalho entra quando a abertura da hero termina */
+.site-header {
   transition: transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.5s ease;
 }
 
@@ -193,8 +193,10 @@ html:not([data-hero="done"]):has(.hero-pin) .site-header {
   pointer-events: none;
 }
 
-html:not([data-hero="done"]):has(.hero-pin) .site-float {
-  transform: translateY(160%);
-  opacity: 0;
-  pointer-events: none;
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

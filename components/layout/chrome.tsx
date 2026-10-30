@@ -1,14 +1,14 @@
 "use client"
 
 import Link from "next/link"
-import { MessageCircle, X } from "lucide-react"
+import { usePathname } from "next/navigation"
+import { X } from "lucide-react"
 import { useContent, useSite } from "@/components/providers"
-import { recordWhatsappLead } from "@/lib/actions"
-import { waLink } from "@/lib/format"
-import { track } from "@/lib/track"
 
 export function CompareBar() {
+  const pathname = usePathname()
   const { compare, clearCompare, toast } = useSite()
+  if (pathname.startsWith("/estoque/comparar")) return toast ? <p className="fixed inset-x-4 bottom-4 z-40 rounded-[22px] bg-signal px-4 py-2 text-center text-sm">{toast}</p> : null
   if (!compare.length && !toast) return null
   return (
     <div className="fixed inset-x-0 bottom-4 z-40 mx-auto flex max-w-[720px] flex-col gap-2 px-4">
@@ -28,31 +28,6 @@ export function CompareBar() {
         </div>
       )}
     </div>
-  )
-}
-
-export function WhatsAppButton() {
-  const { contact } = useContent()
-  const { interest } = useSite()
-  const message = interest
-    ? `Olá! Vi o ${interest.label} no site da Targa Motors. Ref ${interest.ref} | ${interest.label}.`
-    : "Olá! Vim pelo site da Targa Motors e quero conhecer o estoque."
-  return (
-    <a
-      href={waLink(contact.whatsappTel, message)}
-      target="_blank"
-      rel="noreferrer"
-      className="site-float fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 rounded-[22px] bg-white px-4 py-3 text-sm font-medium text-obsidian shadow-[0_10px_40px_rgba(0,0,0,0.35)]"
-      onClick={() => {
-        track({ type: "whatsapp", vehicleSlug: interest?.slug, explicit: true })
-        if (interest) {
-          const sid = sessionStorage.getItem("targa-sid") || ""
-          void recordWhatsappLead({ slug: interest.slug, label: interest.label, ref: interest.ref, sid })
-        }
-      }}
-    >
-      <MessageCircle size={18} /> WhatsApp
-    </a>
   )
 }
 
@@ -93,7 +68,7 @@ export function PageShell({ title, lede, children }: { title?: string; lede?: st
       )}
       {(title || lede) && (
         <header className="mx-auto max-w-[1280px] px-5 pb-8">
-          {title && <h1 className="font-display text-4xl tracking-[-0.04em] md:text-6xl">{title}</h1>}
+          {title && <h1 className="max-w-full text-balance break-words font-display text-[clamp(2rem,8vw,3.75rem)] tracking-[-0.04em] md:text-6xl">{title}</h1>}
           {lede && <p className="mt-4 max-w-2xl text-steel">{lede}</p>}
         </header>
       )}

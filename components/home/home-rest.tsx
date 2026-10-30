@@ -5,6 +5,7 @@ import { useMemo, useState } from "react"
 import { motion } from "motion/react"
 import { useContent } from "@/components/providers"
 import { VehicleCard } from "@/components/vehicles/vehicle-card"
+import { BrandLogo } from "@/components/vehicles/brand-logo"
 import { Price } from "@/components/vehicles/price"
 import { CarPhoto } from "@/components/vehicles/car-photo"
 import { VehicleArt } from "@/components/vehicles/vehicle-art"
@@ -120,8 +121,8 @@ function Search({ vehicles }: { vehicles: PublicVehicle[] }) {
             {suggestions.map((vehicle) => (
               <li key={vehicle.slug}>
                 <Link href={`/veiculo/${vehicle.slug}`} className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-white/5">
-                  <span>{vehicle.brand} {vehicle.model}</span>
-                  <span className="text-accent tabular">{brl(priceOf(vehicle))}</span>
+                  <span className="min-w-0">{vehicle.brand} {vehicle.model}</span>
+                  <span className="shrink-0 text-accent tabular">{brl(priceOf(vehicle))}</span>
                 </Link>
               </li>
             ))}
@@ -138,7 +139,8 @@ function Marquee({ brands }: { brands: [string, number][] }) {
     <section className="marquee overflow-hidden border-y border-white/10 py-6" aria-label="Marcas no estoque">
       <div className="marquee-track flex w-max gap-12 px-8">
         {row.map(([brand, count], index) => (
-          <Link key={`${brand}-${index}`} href={`/estoque?marca=${encodeURIComponent(brand)}`} className="flex items-baseline gap-3 whitespace-nowrap">
+          <Link key={`${brand}-${index}`} href={`/estoque?marca=${encodeURIComponent(brand)}`} className="flex items-center gap-3 whitespace-nowrap">
+            <BrandLogo brand={brand} className="h-9 w-9 text-porcelain" />
             <span className="font-display text-2xl tracking-[0.14em]">{brand.toUpperCase()}</span>
             <span className="text-sm text-steel">{count}</span>
           </Link>
@@ -161,9 +163,9 @@ function Featured({ items }: { items: PublicVehicle[] }) {
             <Link
               key={vehicle.slug}
               href={`/veiculo/${vehicle.slug}`}
-              className="group grid overflow-hidden rounded-[28px] border border-white/10 bg-graphite transition-colors hover:border-white/25 sm:grid-cols-[1fr_1fr]"
+              className="group grid overflow-hidden rounded-[28px] border border-white/10 bg-graphite transition-colors hover:border-white/25 md:grid-cols-[1fr_1fr]"
             >
-              <div className="relative aspect-[4/3] bg-ink sm:aspect-auto sm:min-h-[300px]">
+              <div className="relative aspect-[4/3] bg-ink md:aspect-auto md:min-h-[300px]">
                 {photo ? (
                   <CarPhoto src={photo} alt={`${vehicle.brand} ${vehicle.model}`} fill quality={85} sizes="(max-width: 768px) 100vw, 25vw" className="object-cover object-[50%_70%]" />
                 ) : (
@@ -172,7 +174,10 @@ function Featured({ items }: { items: PublicVehicle[] }) {
               </div>
               <div className="flex flex-col justify-between gap-6 p-6">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-steel">{vehicle.brand}</p>
+                  <p className="flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-steel">
+                    <BrandLogo brand={vehicle.brand} className="h-6 w-6 text-porcelain" />
+                    {vehicle.brand}
+                  </p>
                   <h3 className="mt-2 font-display text-3xl tracking-[-0.03em] md:text-4xl">{vehicle.model}</h3>
                   <p className="mt-2 text-sm text-steel">{vehicle.version}</p>
                   <p className="mt-3 text-sm">{vehicle.yearMake}/{vehicle.yearModel} · {kmLabel(vehicle.km)}</p>

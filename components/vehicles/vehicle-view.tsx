@@ -8,6 +8,7 @@ import { track } from "@/lib/track"
 import { submitVisit } from "@/lib/actions"
 import type { PublicVehicle } from "@/lib/types"
 import { Badges } from "./badges"
+import { BrandLogo } from "./brand-logo"
 import { Price } from "./price"
 import { CarPhoto } from "./car-photo"
 import { VehicleArt } from "./vehicle-art"
@@ -88,16 +89,22 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
         <h2 className="mt-12 font-display text-3xl">Outros {BODY_LABEL[vehicle.bodyType].toLowerCase()}s</h2>
         <div className="mt-4 grid gap-3">
           {related.map((item) => (
-            <a key={item.slug} href={`/veiculo/${item.slug}`} className="flex items-center justify-between rounded-[20px] border border-white/10 px-4 py-3">
-              <span>{item.brand} {item.model}</span>
-              <span className="text-accent tabular">{brl(priceOf(item))}</span>
+            <a key={item.slug} href={`/veiculo/${item.slug}`} className="flex items-center justify-between gap-3 rounded-[20px] border border-white/10 px-4 py-3">
+              <span className="flex min-w-0 items-center gap-2">
+                <BrandLogo brand={item.brand} className="h-5 w-5 shrink-0 text-porcelain" />
+                <span className="min-w-0">{item.brand} {item.model}</span>
+              </span>
+              <span className="shrink-0 text-accent tabular">{brl(priceOf(item))}</span>
             </a>
           ))}
         </div>
       </div>
       <aside className="h-fit rounded-[28px] border border-white/10 bg-graphite p-6 lg:sticky lg:top-28">
-        <p className="text-xs uppercase tracking-[0.18em] text-steel">{vehicle.brand}</p>
-        <h1 className="mt-2 font-display text-4xl tracking-[-0.04em]">{vehicle.model}</h1>
+        <p className="flex items-center gap-2 text-xs uppercase tracking-[0.18em] text-steel">
+          <BrandLogo brand={vehicle.brand} className="h-6 w-6 text-porcelain" />
+          {vehicle.brand}
+        </p>
+        <h1 className="mt-2 text-balance font-display text-[clamp(1.8rem,6vw,2.25rem)] tracking-[-0.04em]">{vehicle.model}</h1>
         <p className="mt-2 text-sm text-steel">{vehicle.version}</p>
         <div className="mt-4"><Badges items={badges(vehicle)} /></div>
         {vehicle.promoPrice && vehicle.promoPrice < vehicle.price && (

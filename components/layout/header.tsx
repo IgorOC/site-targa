@@ -44,7 +44,7 @@ export function Header() {
   }, [phones])
 
   return (
-    <header className="site-header fixed inset-x-0 top-0 z-40">
+    <header className="site-header fixed inset-x-0 top-0 z-40 px-3 sm:px-4 md:px-5">
       <div className="glass mx-auto mt-3 flex max-w-[1280px] items-center justify-between gap-4 rounded-[24px] px-4 py-3 md:px-6">
         <Link href="/" aria-label="Targa Motors" className="shrink-0">
           <Image src="/brand/logo.png" alt="Targa Motors" width={128} height={34} priority className="h-8 w-auto" />

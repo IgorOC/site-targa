@@ -8,7 +8,7 @@ import { getDb } from "@/lib/store"
 export const metadata: Metadata = {
   title: "Quem Somos",
   alternates: { canonical: "/quem-somos" },
-  description: "Targa Motors, loja de seminovos premium no bairro Cidade Jardim, em Uberlândia-MG.",
+  description: "Agência de automóveis de prestígio na região. Veículos novos e usados, nacionais e importados, revisados, na Rua das Papoulas, 60, Cidade Jardim, Uberlândia-MG.",
 }
 
 export default async function AboutPage() {

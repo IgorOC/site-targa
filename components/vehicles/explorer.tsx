@@ -11,6 +11,7 @@ import type { BodyType, PublicVehicle } from "@/lib/types"
 export function Explorer({ vehicles, initial }: { vehicles: PublicVehicle[]; initial: FilterState }) {
   const router = useRouter()
   const [filters, setFilters] = useState<FilterState>(initial)
+  const [openFilters, setOpenFilters] = useState(false)
   const brands = brandCounts(vehicles)
   const models = modelCounts(vehicles, filters.marca || undefined)
   const years = [...new Set(vehicles.flatMap((vehicle) => [vehicle.yearModel, vehicle.yearMake]))].sort((a, b) => b - a)
@@ -32,7 +33,17 @@ export function Explorer({ vehicles, initial }: { vehicles: PublicVehicle[]; ini
 
   return (
     <div className="mx-auto grid max-w-[1280px] gap-8 px-5 pb-36 lg:grid-cols-[280px_1fr]">
-      <aside className="h-fit rounded-[24px] border border-white/10 bg-graphite p-5 lg:sticky lg:top-28">
+      <div>
+        <button
+          type="button"
+          className="flex w-full items-center justify-between rounded-[22px] border border-white/15 px-4 py-3 text-sm lg:hidden"
+          aria-expanded={openFilters}
+          onClick={() => setOpenFilters((value) => !value)}
+        >
+          Filtros
+          <span className="text-steel">{openFilters ? "Fechar" : "Abrir"}</span>
+        </button>
+        <aside className={`${openFilters ? "mt-4 block" : "hidden lg:block"} h-fit rounded-[24px] border border-white/10 bg-graphite p-5 lg:sticky lg:top-28 lg:mt-0`}>
         <h2 className="font-display text-2xl">Filtros</h2>
         <label className="mt-4 block text-xs uppercase tracking-[0.14em] text-steel">
           Busca
@@ -91,13 +102,14 @@ export function Explorer({ vehicles, initial }: { vehicles: PublicVehicle[]; ini
         <button className="mt-5 text-sm text-accent" onClick={() => { setFilters(EMPTY_FILTERS); router.replace("/estoque", { scroll: false }) }}>
           Limpar filtros
         </button>
-      </aside>
+        </aside>
+      </div>
       <div>
         <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
           <p className="text-sm text-steel">{result.length} {result.length === 1 ? "veículo encontrado" : "veículos encontrados"}.</p>
-          <label className="text-sm text-steel">
+          <label className="flex flex-wrap items-center gap-2 text-sm text-steel">
             Ordenar
-            <select value={filters.ordem} onChange={(event) => update({ ordem: event.target.value })} className="ml-2 rounded-[16px] border border-white/10 bg-obsidian px-3 py-2 text-porcelain">
+            <select value={filters.ordem} onChange={(event) => update({ ordem: event.target.value })} className="max-w-full rounded-[16px] border border-white/10 bg-obsidian px-3 py-2 text-porcelain">
               <option value="marca">Marca/Modelo</option>
               <option value="preco-asc">Preço (crescente)</option>
               <option value="preco-desc">Preço (decrescente)</option>

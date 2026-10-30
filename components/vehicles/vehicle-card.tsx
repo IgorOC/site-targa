@@ -7,6 +7,7 @@ import { kmLabel, refCode, vehicleInterestMessage, waLink } from "@/lib/format"
 import { track } from "@/lib/track"
 import type { PublicVehicle } from "@/lib/types"
 import { Badges } from "./badges"
+import { BrandLogo } from "./brand-logo"
 import { Price } from "./price"
 import { CarPhoto } from "./car-photo"
 import { VehicleArt } from "./vehicle-art"
@@ -38,7 +39,10 @@ export function VehicleCard({ vehicle }: { vehicle: PublicVehicle }) {
           </div>
         </div>
         <div className="space-y-2 px-5 pt-5">
-          <p className="text-[11px] uppercase tracking-[0.18em] text-steel">{vehicle.brand}</p>
+          <p className="flex items-center gap-2 text-[11px] uppercase tracking-[0.18em] text-steel">
+            <BrandLogo brand={vehicle.brand} className="h-5 w-5 text-porcelain" />
+            {vehicle.brand}
+          </p>
           <h3 className="font-display text-2xl tracking-[-0.03em]">{vehicle.model}</h3>
           <p className="line-clamp-2 min-h-10 text-sm text-steel">{vehicle.version}</p>
           <p className="text-sm">

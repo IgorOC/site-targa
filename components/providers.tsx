@@ -108,6 +108,7 @@ export function Providers({ content, children }: { content: Content; children: R
     if (reduce) return
     const lenis = new Lenis({ lerp: 0.085 })
     scrollBus.lenis = lenis
+    if (document.documentElement.dataset.intro === "on") lenis.stop()
     lenis.on("scroll", ScrollTrigger.update)
     const tick = (time: number) => lenis.raf(time * 1000)
     gsap.ticker.add(tick)
