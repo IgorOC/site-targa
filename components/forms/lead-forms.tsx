@@ -16,6 +16,7 @@ export function ContactForm() {
         const data = new FormData(event.currentTarget)
         data.set("sid", sessionStorage.getItem("targa-sid") || "")
         const response = await submitContact(data)
+        if (response.ok) track({ type: "contact_submit", explicit: true })
         setMessage(response.ok ? "Mensagem recebida. A Targa responde no horário de atendimento." : response.error || "Não foi possível enviar.")
         if (response.ok) event.currentTarget.reset()
       }}
@@ -48,6 +49,7 @@ export function FinanceForm({ vehicleLabel, vehicleSlug, refCode }: { vehicleLab
         const data = new FormData(event.currentTarget)
         data.set("sid", sessionStorage.getItem("targa-sid") || "")
         const response = await submitFinance(data)
+        if (response.ok) track({ type: "finance_submit", vehicleSlug, explicit: true })
         setMessage(response.ok ? "Ficha recebida. A loja retorna com as condições reais, sem parcela estimada no site." : response.error || "Não foi possível enviar.")
       }}
     >

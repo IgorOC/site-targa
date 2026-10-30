@@ -11,6 +11,7 @@ import { Badges } from "./badges"
 import { BrandLogo } from "./brand-logo"
 import { Price } from "./price"
 import { CarPhoto } from "./car-photo"
+import { useActiveTime } from "./use-active-time"
 import { VehicleArt } from "./vehicle-art"
 
 export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; related: PublicVehicle[] }) {
@@ -26,6 +27,7 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
     track({ type: "vehicle_view", vehicleSlug: vehicle.slug })
     return () => setInterest(null)
   }, [setInterest, vehicle.brand, vehicle.model, vehicle.slug])
+  useActiveTime(vehicle.slug)
 
   return (
     <div className="mx-auto grid max-w-[1280px] gap-10 px-5 pb-20 lg:grid-cols-[1.3fr_0.7fr]">
@@ -43,7 +45,10 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
         {photos.length > 1 && (
           <div className="mt-3 flex gap-2 overflow-x-auto" onClick={() => track({ type: "gallery", vehicleSlug: vehicle.slug })}>
             {photos.map((src, index) => (
-              <button key={src} className={`relative h-24 w-[72px] shrink-0 overflow-hidden rounded-2xl border ${index === photo ? "border-accent" : "border-white/10"}`} onClick={() => setPhoto(index)} aria-label={`Ver foto ${index + 1} de ${photos.length}`} aria-pressed={index === photo}>
+              <button key={src} className={`relative h-24 w-[72px] shrink-0 overflow-hidden rounded-2xl border ${index === photo ? "border-accent" : "border-white/10"}`} onClick={() => {
+                  setPhoto(index)
+                  track({ type: "photo_view", vehicleSlug: vehicle.slug, meta: { index: index + 1 } })
+                }} aria-label={`Ver foto ${index + 1} de ${photos.length}`} aria-pressed={index === photo}>
                 <CarPhoto src={src} alt="" fill className="object-cover" sizes="96px" />
               </button>
             ))}
@@ -136,6 +141,7 @@ export function VehicleView({ vehicle, related }: { vehicle: PublicVehicle; rela
             data.set("refCode", refCode(vehicle.slug))
             data.set("sid", sessionStorage.getItem("targa-sid") || "")
             const response = await submitVisit(data)
+            if (response.ok) track({ type: "visit_submit", vehicleSlug: vehicle.slug, explicit: true })
             setSent(response.ok ? "Pedido de visita enviado." : response.error || "Não foi possível enviar.")
           }}
         >
