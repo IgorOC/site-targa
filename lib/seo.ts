@@ -1,4 +1,5 @@
 import { coverOf, priceOf } from "./catalog"
+import { isAllowedPhoto, photoPath } from "./photo"
 import { SITE } from "./site"
 import type { Content, Faq, PublicVehicle, Vehicle } from "./types"
 
@@ -29,7 +30,7 @@ export const absolute = (path: string) => (path.startsWith("http") ? path : `${S
 export function photoAbsolute(src: string, width = 1200) {
   if (!src) return ""
   if (src.startsWith("/")) return absolute(src)
-  return absolute(`/api/foto?src=${encodeURIComponent(src)}&w=${width}`)
+  return absolute(isAllowedPhoto(src) ? photoPath(src, width) : src)
 }
 
 function hours(content: Content) {

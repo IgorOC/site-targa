@@ -30,8 +30,8 @@ export function Hero({ total }: { total: number }) {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const progress = { value: reduce ? 1 : 0 }
     let start = -1
-    const hold = 500
-    const duration = 3800
+    const hold = 200
+    const duration = 3000
     let frame = 0
     let began = false
 
@@ -100,7 +100,7 @@ export function Hero({ total }: { total: number }) {
     draw()
     if (reduce) begin()
     window.addEventListener("targa-intro-done", begin)
-    const fallback = window.setTimeout(begin, 4500)
+    const fallback = window.setTimeout(begin, 2500)
     window.addEventListener("resize", draw)
     window.addEventListener("scroll", revealIfPassed, { passive: true })
     return () => {

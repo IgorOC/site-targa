@@ -5,8 +5,11 @@ import Image from "next/image"
 import { usePathname } from "next/navigation"
 import { scrollBus } from "@/lib/scroll-bus"
 
-const HOLD = 2800
-const FADE = 800
+// Primeira abertura do site mostra a logo um pouco; nas trocas de página a tela é bem curta
+const HOLD_FIRST = 1400
+const HOLD_NAV = 450
+const FADE = 450
+let opened = false
 
 function lockPage() {
   document.documentElement.dataset.intro = "on"
@@ -40,7 +43,8 @@ export function PageIntro() {
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-    const hold = reduce ? 280 : HOLD
+    const hold = reduce ? 280 : opened ? HOLD_NAV : HOLD_FIRST
+    opened = true
     const fade = reduce ? 0 : FADE
     lockPage()
     const leaveAt = window.setTimeout(() => {
